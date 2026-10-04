@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/quasar-console/"
+title = "Quasar Console"
+description = "An operator console for Quasar's microservice incident demos, versioned RL policy status, and audited recovery runs."
+version = "1.0.0"
+id = "artifacts/quasar-console"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/quasar-console/" ]
+localPort = 21295
+
+[services.development]
+run = "pnpm --filter @workspace/quasar-console run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/quasar-console", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/quasar-console/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21295"
+BASE_PATH = "/quasar-console/"

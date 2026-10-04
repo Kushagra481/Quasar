@@ -1,0 +1,14 @@
+{
+  "name": "@workspace/quasar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@langchain/core": "^1.1.48",
+    "@google/genai": "^1.50.0",
+    "@langchain/langgraph": "^1.2.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": { "@types/node": "catalog:" }
+}

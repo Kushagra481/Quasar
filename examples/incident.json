@@ -1,0 +1,28 @@
+{
+  "observedAt": "2026-10-04T12:00:00.000Z",
+  "source": "synthetic-example-telemetry (not LO2)",
+  "services": [
+    {
+      "name": "worker",
+      "status": "down",
+      "restarts": 4,
+      "cpuPercent": null,
+      "memoryPercent": null,
+      "errorRate": 1,
+      "latencyMs": null,
+      "dependencies": [],
+      "logs": ["fatal crash: worker exited with code 1", "readiness probe failed"]
+    },
+    {
+      "name": "gateway",
+      "status": "degraded",
+      "restarts": 0,
+      "cpuPercent": 12,
+      "memoryPercent": 20,
+      "errorRate": 0.8,
+      "latencyMs": 1900,
+      "dependencies": ["worker"],
+      "logs": ["upstream worker returned HTTP 503"]
+    }
+  ]
+}

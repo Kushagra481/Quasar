@@ -1,0 +1,147 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+paths:
+  /quasar/status:
+    get:
+      operationId: getQuasarStatus
+      tags: [quasar]
+      summary: Framework status and available capabilities
+      responses:
+        "200":
+          description: Framework capabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /quasar/demo:
+    post:
+      operationId: runQuasarDemo
+      tags: [quasar]
+      summary: Run a synthetic local HTTP incident using the offline reasoner
+      description: No live infrastructure tools or paid LLM calls are available through this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuasarDemoRequest"
+      responses:
+        "200":
+          description: Completed debugging run (check status for recovery or escalation)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuasarRun"
+        "400":
+          description: Invalid input
+        "429":
+          description: Too many concurrent local runs
+  /quasar/runs:
+    get:
+      operationId: listQuasarRuns
+      tags: [quasar]
+      summary: List local API demo runs (not CLI live-infrastructure histories)
+      responses:
+        "200":
+          description: Most recent persisted local demo runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuasarRun"
+  /quasar/runs/{id}:
+    get:
+      operationId: getQuasarRun
+      tags: [quasar]
+      summary: Read a local demo audit trail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Persisted local run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuasarRun"
+        "404":
+          description: Run not found
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+components:
+  schemas:
+    QuasarDemoRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        fault:
+          type: string
+          enum: [crash, resource, regression, dependency]
+        apply:
+          type: boolean
+          default: false
+        allowRollback:
+          type: boolean
+          default: false
+      required: [fault]
+    QuasarRun:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [resolved, proposed, escalated, failed]
+        adapter:
+          type: string
+        reasoner:
+          type: string
+        policyVersion:
+          type: string
+        mutations:
+          type: integer
+        durationMs:
+          type: number
+        steps:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required: [id, status, adapter, reasoner, policyVersion, mutations, durationMs, steps]
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
